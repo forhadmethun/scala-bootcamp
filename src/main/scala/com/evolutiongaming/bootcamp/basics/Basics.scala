@@ -63,7 +63,7 @@ object Basics {
   val bool2: Boolean = false
 
   // Exercise. List all boolean values.
-  val allBooleans: Set[Boolean] = Set( /* add values here, separated by commas */ )
+  val allBooleans: Set[Boolean] = Set(true, false)
 
   /* Common boolean operations:
       !false          // true - `!` is negation
@@ -77,7 +77,7 @@ object Basics {
   // -128 to 127
   val byte1: Byte = 4
 
-  // Question. How large would a set of all possible Byte values be?
+  // Question. How large would a set of all possible Byte values be? 256 * 8 bit
 
   // Short - 16-bit signed integer (-2^15 to 2^15 - 1, inclusive)
   // -32,768 to 32,767
@@ -98,7 +98,7 @@ object Basics {
   val float1: Float = Float.NaN
 
   // Question. What is the value of the following line?
-  val floatComparisonResult: Boolean = 0.3 == 0.1 + 0.1 + 0.1
+  val floatComparisonResult: Boolean = 0.3 == 0.1 + 0.1 + 0.1 // false
 
   // Double - 64-bit double-precision float
   // 4.94065645841246544e-324d to 1.79769313486231570e+308d (positive or negative)
@@ -251,10 +251,10 @@ object Basics {
   // Try defining it using both String concatenation and interpolation.
   //
   // Note. `???` can be used to indicate code that is yet to be implemented.
-  def helloMethod(name: String): String = ???
+  def helloMethod(name: String): String = s"Hello, $name!"
 
   // Exercise. Define a method "add" which takes two integers and returns their sum.
-  def add(a: Int, b: Int): Int = a * 42 - b / 4 // replace with a correct implementation
+  def add(a: Int, b: Int): Int = a + b  // replace with a correct implementation
 
   // You can use parameter names to specify them in a different order
   val sum1 = add(b = 2, a = 3) // addition is commutative though so it doesn't change the result
@@ -276,11 +276,11 @@ object Basics {
   // Exercise. Implement `helloFunction` using `helloMethod` you implemented above. Why was the type
   // annotation skipped when defining `helloFunction`?
 
-  val helloFunction: String => String = (name: String) => /* implement here */ name
+  val helloFunction: String => String = (name: String) => s"Hello, $name!"
 
   // Exercise. Using the aforementioned String `length` implement a `stringLength` function which returns
   // the length of the String passed.
-  val stringLength: String => Int = (s: String) => /* implement here */ s.hashCode()
+  val stringLength: String => Int = _.length // when to ignore bracket after method name? - if pure function then omit bracket!!
 
   // If each argument of a function is used exactly once, you can use `_` to refer to them
   val addFunction: (Int, Int) => Int = _ + _
@@ -346,10 +346,8 @@ object Basics {
   // For conversions, use `Double#round` (for rounding Double-s to Long-s) as well as `Byte` and `Int`
   // `toDouble` (for converting Byte-s and Int-s to Double-s).
 
-  def power(n: Byte): Int => Long = { x: Int =>
-    // implement here
-    (x + n).toLong
-  }
+  def power(n: Byte): Int => Long = Math.pow(_, n).toLong
+
 
   private val squared: Int => Long = power(2)
   private val fourSquared = squared(4)
@@ -426,16 +424,22 @@ object Basics {
   // More exercises to help internalise the "types define the set of possible values that a value can have":
 
   // Exercise. List all values of the type `Option[Boolean]`:
-  val allOptionBooleans: Set[Option[Boolean]] = Set()
+  val allOptionBooleans: Set[Option[Boolean]] = Set(Some(true), Some(false), None)
 
   // Exercise. List all values of the type `Either[Unit, Boolean]`:
-  val allEitherUnitBooleans: Set[Either[Unit, Boolean]] = Set()
+  val allEitherUnitBooleans: Set[Either[Unit, Boolean]] = Set(
+    Left(()), Right(true), Right(false)
+  )
 
   // Exercise. List all values of the type `Either[Boolean, Boolean]`:
-  val allEitherBooleanBooleans: Set[Either[Boolean, Boolean]] = Set()
+  val allEitherBooleanBooleans: Set[Either[Boolean, Boolean]] =
+//    Set(Left(true), Left(false), Right(true), Right(false))
+    Set(true, false).flatMap(a => Set(Left(a), Right(a)))
 
   // Exercise. List all values of the type `(Boolean, Boolean)`:
-  val allTupleBooleanBooleans: Set[(Boolean, Boolean)] = Set()
+  val allTupleBooleanBooleans: Set[(Boolean, Boolean)] =
+//    Set((false, false), (false, true), (true, false), (true, true))
+    Set(true, false).flatMap(a => Set((true, a), (false, a)))
 
   // Question. Can we make a `Set` with all possible `Byte` values? `Double` values? `String` values?
 }
