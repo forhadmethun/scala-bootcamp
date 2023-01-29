@@ -55,12 +55,16 @@ object ClassesAndTraits {
     def balance: Double
   }
 
+  object HasBalance {
+    def equals(that: Double): Boolean = that == balance
+  }
+
   // Exercise. Implement a method that will allow aggregating all entities with balances into one
   // that will have the sum of all balances inside.
   //
   def totalBalance(accounts: List[HasBalance]): HasBalance =
     new HasBalance {
-      def balance: Double = ???
+      def balance: Double = accounts.map(_.balance).sum
     }
 
   trait Account extends HasBalance {
@@ -122,8 +126,8 @@ object ClassesAndTraits {
 
   // Question. Do you agree with how the stack is modelled here? What would you do differently?
   final case class Stack[A](elements: List[A] = Nil) {
-    def push(x: A): Stack[A] = ???
-    def peek: A              = ???
-    def pop: (A, Stack[A])   = ???
+    def push(x: A): Stack[A] = Stack(x::elements)
+    def peek: A              = elements.head
+    def pop: (A, Stack[A])   = (elements.head, Stack(elements.tail))
   }
 }
