@@ -1,6 +1,7 @@
 package com.evolutiongaming.bootcamp.functions
 
 import java.time.Instant
+import scala.util.Try
 
 object Functions {
 
@@ -21,8 +22,8 @@ object Functions {
   // Higher-order functions take and/or return other functions.
 
   // Question. Are these first-order of higher order functions?
-  val normalize: String => String = message => message.trim.toLowerCase
-  val processText: (String, String => String) => String = (message, f) => f.apply(message)
+  val normalize: String => String = message => message.trim.toLowerCase // first order function
+  val processText: (String, String => String) => String = (message, f) => f.apply(message) // higher order function
 
   // Scala has both functions and methods. Most of the time we can ignore this distinction (as done in this
   // lecture), however, internally they are two different things. Scala method, as in Java, is a part of a
@@ -34,13 +35,27 @@ object Functions {
   def processText2(message: String, f: String => String): String = f(message)
 
   // Exercise. Implement `isEven` method that checks if a number is even.
-  def isEven(n: Int): Boolean = ???
+  def isEven(n: Int): Boolean = n % 2 == 0
 
   // Exercise. Implement `isEvenFunc` function that behaves exactly like `isEven` method.
-  val isEvenFunc: Int => Boolean = n => ???
+  val isEvenFunc: Int => Boolean = n => n % 2 == 0
+  val isEvenFunc2: Int => Boolean = _ % 2 == 0
+  val isEvenFunc3: (Int, Int) => Boolean = (_ % _ == 0)
 
   // Exercise. Implement `isEvenMethodToFunc` function by transforming `isEven` method into a function.
-  val isEvenMethodToFunc: Int => Boolean = n => ???
+  val isEvenMethodToFunc: Int => Boolean = isEven
+  val isEvenMethodToFunc1 = isEven _ // converting a method to function
+
+  case class A(a: Int)
+  val v: Option[Int] = Some(1)
+
+//  object A {} // then v.map(A) won't work
+
+  v.map(a => A(a))
+  v.map(A(_))
+  v.map(A)
+
+
 
   // There are traits in Scala to represent functions with various numbers of arguments: `Function0`,
   // `Function1`, `Function2`, etc. So `(A => B)` is the same as `Function1[A, B]`. A trait, where
@@ -68,17 +83,17 @@ object Functions {
   trait MyMap[K, V] extends (K => V)
 
   // Question. What function should we extend to check if an element belongs to a set?
-  trait MySet[A] // extends ???
+  trait MySet[A] extends (A => Boolean)
 
   // Question. What function should we extend to return a value by its index?
-  trait MySeq[A] // extends ???
+  trait MySeq[A] extends (Int => A)
 
   // POLYMORPHIC FUNCTIONS
 
   // Polymorphic functions have at least one type parameter.
 
   // Exercise. Implement `mapOption` function without calling `Option` APIs.
-  def mapOption[A, B](option: Option[A], f: A => B): Option[B] = ???
+  def mapOption[A, B](option: Option[A], f: A => B): Option[B] = option.map(f)
 
   // FUNCTION COMPOSITION
 
@@ -159,12 +174,12 @@ object Functions {
   // - works with shared mutable state;
   // ...
 
-  // Question. Why usage of `null` breaks function purity?
+  // Question. Why usage of `null` breaks function purity? => null induce null pointer exception so breaks purity
 
-  // Question. Is `plus` a pure function? Why?
+  // Question. Is `plus` a pure function? Why? => pure, no exception even if overflow
   def plus(a: Int, b: Int): Int = a + b
 
-  // Question. Is `mapLookup` a pure function? Why?
+  // Question. Is `mapLookup` a pure function? Why? => no throws exception while key/value not exists
   def mapLookup(map: Map[String, Int], key: String): Int = map(key)
 
   // Question. If a function returns the same value for all inputs, is it pure?
@@ -180,6 +195,7 @@ object Functions {
 
   def parseDate(s: String): Instant = Instant.parse(s)
   def parseDatePure(s: String): ??? = ???
+  def parseDatePure1(s: String): Option[Instant] = Try(parseDate(s)).toOption
 
   def divide(a: Int, b: Int): Int = a / b
   def dividePure(a: Int, b: Int): ??? = ???

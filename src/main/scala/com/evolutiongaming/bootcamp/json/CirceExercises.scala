@@ -47,7 +47,12 @@ object CirceExercises {
       "isRatedR" true
     }
     */
-    lazy val jMatrix: Json = ???
+    lazy val jMatrix: Json = Json.obj(
+      "title" -> Json.fromString("The Matrix"),
+      "year" -> Json.fromInt(1999),
+      "actors" -> Json.arr("Keanu Reeves".asJson, "Carrie-Anne Moss".asJson, "Laurence Fishburne".asJson),
+      "isRatedR" -> Json.fromBoolean(true)
+    )
 
     /* Parsing */
     val twinPeaksRawJson: String =
@@ -98,7 +103,13 @@ object CirceExercises {
         |  }
         |}
         |""".stripMargin
-    lazy val killersOnTourJson: Json = ???
+    lazy val killersOnTourJson: Json = parse(killersRawJson).getOrElse(Json.Null)
+      .hcursor
+      .downField("artist")
+      .downField("ontour")
+      .withFocus(_.mapBoolean(_ => true))
+      .top
+      .getOrElse(Json.Null)
   }
 
   /* Optics */
@@ -117,7 +128,8 @@ object CirceExercises {
     val oldGoodTwinPeaks: Json = _oldGoodTwinPeaks(twinPeaksParsed)
 
     /* Exercise 3: same as 2, but using optics */
-    lazy val killersOnTourJson: Json = ???
+    val oldKiller = root.artist.ontour.boolean.modify(_ =>true)
+    lazy val killersOnTourJson: Json = oldKiller(parsedKillersJson)
   }
 
   /* Encoding/decoding, part I */

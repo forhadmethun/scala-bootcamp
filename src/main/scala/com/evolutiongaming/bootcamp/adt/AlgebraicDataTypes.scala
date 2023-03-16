@@ -69,14 +69,22 @@ object AlgebraicDataTypes {
   // Exercise. Create a smart constructor for `GameLevel` that only permits levels from 1 to 80 (inclusive).
   final case class GameLevel private (value: Int) extends AnyVal
   object GameLevel {
-    def create(value: Int): Option[GameLevel] = ???
+    def create(value: Int): Option[GameLevel] = {
+//      if (value >=1 && value <= 80) Some(GameLevel(value)) else None
+      Option.when(value >= 1 && value <= 80)(GameLevel(value))
+    }
   }
 
   // To disable creating case classes in any other way besides smart constructor, the following pattern
   // can be used. However, it is rather syntax-heavy and cannot be combined with value classes.
   sealed abstract case class Time private (hour: Int, minute: Int)
   object Time {
-    def create(hour: Int, minute: Int): Either[String, Time] = Right(new Time(hour, minute) {})
+    def create(hour: Int, minute: Int): Either[String, Time] = {
+      for {
+        hourParsed <- if(hour >=0 && hour <=23) Right(hour) else Left("Invalid hour value")
+        minuteParsed <- if(minute >=0 && hour <=59) Right(minute) else Left("Invalid minute value")
+      } yield new Time(hourParsed, minuteParsed) {}
+    }
   }
 
   // Exercise. Implement the smart constructor for `Time` that only permits values from 00:00 to 23:59 and
@@ -93,6 +101,14 @@ object AlgebraicDataTypes {
     final case object True extends Bool
     final case object False extends Bool
   }
+
+  sealed trait TimeUnit
+  object TimeUnit {
+    final case class Nanos(nanos: Long) extends TimeUnit
+    final case class Days(days: Long) extends TimeUnit
+  }
+
+  // case classes -> generated companion object -> Companion: apply (construction) + unapply (deconstruction)
 
   // Note that sealed keyword means that `Bool` can only be extended in the same file as its declaration.
   // Question. Why do you think sealed keyword is essential to define sum types?
@@ -135,7 +151,12 @@ object AlgebraicDataTypes {
     creditCardService: CreditCardService,
     cashService: CashService,
   ) {
-    def processPayment(amount: BigDecimal, method: PaymentMethod): PaymentStatus = ???
+    def processPayment(amount: BigDecimal, method: PaymentMethod): PaymentStatus = method match {
+      case BankAccount(accountNumber) => bankAccountService.processPayment(amount, accountNumber)
+      case credit: CreditCard => creditCardService.processPayment(amount, credit)
+//      case CreditCard(cardNumber, validityDate) => creditCardService.processPayment(amount, CreditCard(cardNumber, validityDate))
+      case PaymentMethod.Cash => cashService.processPayment(amount)
+    }
   }
 
   // Let's compare that to `NaivePaymentService.processPayment` implementation, which does not use ADTs, but
