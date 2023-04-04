@@ -139,7 +139,14 @@ trait Console {
   def putString(value: String): IO[Unit]
   def readString: IO[String]
 }
-
+trait Console2[F[_]] {
+  def putString(value: String): F[Unit]
+  def readString: F[String]
+}
+class ConsoleF[F[_]: Async] {
+   def putString(value: String): F[Unit] = Async[F].delay(println(value))
+   def readString: F[String] = Async[F].delay(StdIn.readLine())
+}
 object ConsoleIO extends Console {
   def putString(value: String): IO[Unit] = IO(println(value))
   def readString: IO[String]             = IO(StdIn.readLine())
